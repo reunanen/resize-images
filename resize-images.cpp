@@ -16,6 +16,7 @@ int main(int argc, char** argv)
     options.add_options()
         ("d,directory", "The directory where to search for input files", cxxopts::value<std::string>())
         ("s,scaling-factor", "Try >1 to upscale, and <1 to downscale", cxxopts::value<double>())
+        ("i,interpolation-method", "Try 0 for nearest neighbor, 1 for bilinear, 2 for bicubic, 3 for pixel area, or 4 for Lanczos", cxxopts::value<int>()->default_value("1"))
         ;
 
     try {
@@ -25,6 +26,7 @@ int main(int argc, char** argv)
 
         const std::string directory = options["directory"].as<std::string>();
         const double scaling_factor = options["scaling-factor"].as<double>();
+        const int interpolation_method = options["interpolation-method"].as<int>();
 
         std::cout << "Searching for images in " << directory << " ..." << std::endl;
 
@@ -50,7 +52,7 @@ int main(int argc, char** argv)
                     << ", channels = " << image.channels()
                     << ", type = 0x" << std::hex << image.type();
 
-                cv::resize(image, image, cv::Size(), scaling_factor, scaling_factor, cv::INTER_LINEAR);
+                cv::resize(image, image, cv::Size(), scaling_factor, scaling_factor, interpolation_method);
 
                 cv::imwrite(full_name, image);
             }
